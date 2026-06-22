@@ -3,6 +3,7 @@
 import ContactForm from "./components/ContactForm";
 import MediaShowcase from "./components/MediaShowcase";
 import Navbar from "./components/Navbar";
+import Featured from "./components/Featured";
 
 
 export default function Home() {
@@ -154,6 +155,7 @@ export default function Home() {
       {/* Images and videos */}
 
       <MediaShowcase />
+      < Featured/>
 
       {/* ── CONTACT ── */}
       <div id="contact">
