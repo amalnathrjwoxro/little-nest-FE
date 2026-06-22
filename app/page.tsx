@@ -1,6 +1,7 @@
 "use client";
 
 import ContactForm from "./components/ContactForm";
+import MediaShowcase from "./components/MediaShowcase";
 import Navbar from "./components/Navbar";
 
 
@@ -149,6 +150,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Images and videos */}
+
+      <MediaShowcase />
 
       {/* ── CONTACT ── */}
       <div id="contact">
