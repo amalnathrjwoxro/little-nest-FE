@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 
-type Video = {
-  id: string;
-  title: string;
+type MediaFile = {
   url?: string;
   filename?: string;
 };
 
+type Video = {
+  id: string;
+  title: string;
+  video?: MediaFile;   
+};
+
 const API_BASE = process.env.NEXT_PUBLIC_PAYLOAD_API_URL;
 
-export default function MediaGallery() {
+export default function VideosPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +24,8 @@ export default function MediaGallery() {
     async function loadVideos() {
       try {
         const res = await fetch(
-          `${API_BASE}/api/videos?limit=50&sort=-createdAt`
+          `${API_BASE}/api/videos?depth=1&limit=50&sort=-createdAt`,
+          { cache: "no-store" }
         );
 
         const data = await res.json();
@@ -35,96 +41,79 @@ export default function MediaGallery() {
   }, []);
 
   return (
-    <section className="py-20 px-6 bg-[#fffafc]">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-center text-[22px] font-semibold text-[#3d1f2a] mb-2 tracking-tight">
-          Gallery & Videos
-        </h2>
+    <main className="min-h-screen bg-[#fffafc]">
+      <Navbar />
 
-        <p className="text-center text-[13px] text-[#c0849a] mb-12">
-          Explore adorable moments and product showcases.
+      <section className="px-6 pt-32 pb-16 max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold text-[#3d1f2a]">
+          Videos Gallery
+        </h1>
+
+        <p className="text-[#c0849a] mt-2">
+          Watch adorable baby moments and product showcases.
         </p>
 
         {loading && (
-          <p className="text-center text-[#c0849a]">
-            Loading videos...
-          </p>
+          <p className="text-[#c0849a] mt-10">Loading videos...</p>
         )}
 
         {!loading && videos.length === 0 && (
-          <p className="text-center text-[#c0849a]">
-            No videos available.
-          </p>
+          <p className="text-[#c0849a] mt-10">No videos added yet.</p>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
           {videos.map((video) => {
-            const videoUrl = video.url?.startsWith("http")
-              ? video.url
-              : `${API_BASE}${video.url}`;
+            const file = video.video;
+
+            const videoUrl = file?.url?.startsWith("http")
+              ? file.url
+              : file?.url
+              ? `${API_BASE}${file.url}`
+              : "";
 
             return (
-              <div
+              <article
                 key={video.id}
-                className="bg-white rounded-3xl border border-[#f5d0da] overflow-hidden hover:scale-105 hover:shadow-md transition-all duration-300"
+                className="bg-white border border-[#f5d0da] rounded-2xl overflow-hidden"
               >
-                <div className="relative aspect-[4/3] bg-[#fde8ed] overflow-hidden">
-                  {video.url ? (
-                    <>
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        className="w-full h-full object-cover"
-                      >
-                        <source src={videoUrl} type="video/mp4" />
-                      </video>
-
-                      <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm rounded-full p-2">
-                        <svg
-                          width="14"
-                          height="14"
-                          fill="white"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </>
+                {/* VIDEO */}
+                <div className="h-52 w-full bg-[#fde8ed]">
+                  {videoUrl ? (
+                    <video
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                    >
+                      <source src={videoUrl} type="video/mp4" />
+                    </video>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <svg
-                        width="24"
-                        height="24"
-                        fill="#e8829a"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                    <div className="h-full w-full flex items-center justify-center text-[#e8829a]">
+                      No Video
                     </div>
                   )}
                 </div>
 
+                {/* CONTENT */}
                 <div className="p-5">
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#ffe8ef] text-[#e8829a] text-[11px] font-semibold mb-3">
-                    Video
-                  </span>
+                  <p className="text-xs uppercase tracking-widest text-[#e8829a] mb-2">
+                    video
+                  </p>
 
-                  <h3 className="text-[15px] font-semibold text-[#3d1f2a]">
+                  <h2 className="text-lg font-bold text-[#3d1f2a]">
                     {video.title}
-                  </h3>
+                  </h2>
 
-                  <p className="text-[12px] text-[#c0849a] mt-2">
-                    {video.filename}
+                  <p className="text-sm text-[#8c6373] mt-2 line-clamp-2">
+                    {file?.filename || "Baby moment video"}
                   </p>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
